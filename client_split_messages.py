@@ -41,8 +41,8 @@ class ChatClientSplitMessages:
       last_char_to_send = random.randrange(chars_sent, utils.MESSAGE_LENGTH + 1)
       message_to_send = padded_message[chars_sent:last_char_to_send]
       if len(message_to_send) > 0:
-        print "Sending {} characters: {}".format(
-          last_char_to_send - chars_sent, message_to_send)
+        print("Sending {} characters: {}".format(
+          last_char_to_send - chars_sent, message_to_send))
         client_socket.sendall(message_to_send)
         chars_sent = last_char_to_send
 
@@ -51,7 +51,7 @@ class ChatClientSplitMessages:
     try:
       client_socket.connect((self.server_host, self.server_port))
     except:
-      print utils.CLIENT_CANNOT_CONNECT.format(self.server_host, self.server_port)
+      print(utils.CLIENT_CANNOT_CONNECT.format(self.server_host, self.server_port))
       return
 
     my_name = "SplitMessagesChatClient"
@@ -72,7 +72,7 @@ class ChatClientSplitMessages:
 
 if __name__ == "__main__":
   if (len(sys.argv)) < 3:
-    print "Usage: python client_split_messages.py server_hostname server_port"
+    print("Usage: python client_split_messages.py server_hostname server_port")
     sys.exit(1)
 
   chat_client = ChatClientSplitMessages(sys.argv[1], int(sys.argv[2]))

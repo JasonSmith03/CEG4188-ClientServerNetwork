@@ -1,6 +1,9 @@
 import socket
 import sys
 
+from pip._vendor.distlib.compat import raw_input
+
+
 class BasicClient(object):
 
     def __init__(self, address, port):
@@ -14,7 +17,7 @@ class BasicClient(object):
 
 args = sys.argv
 if len(args) != 3:
-    print "Please supply a server address and port."
+    print("Please supply a server address and port.")
     sys.exit()
 client = BasicClient(args[1], args[2])
 msg = raw_input()

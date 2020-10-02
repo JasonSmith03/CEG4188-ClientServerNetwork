@@ -75,7 +75,7 @@ class SimpleTest():
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print "Usage: python simple_test.py <port>"
+        print("Usage: python simple_test.py <port>")
         sys.exit(1)
 
     port = int(sys.argv[1])
