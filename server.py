@@ -21,6 +21,7 @@ nicknames = []
 # Sending Messages To All Connected Clients
 def broadcast(message):
     for client in clients:
+        #print(client)
         client.send(message)
 
 # Handling Messages From Clients
@@ -46,6 +47,7 @@ def receive():
         # Accept Connection
         client, address = server.accept()
         print("Connected with {}".format(str(address)))
+        print("Accepted client {}".format(str(client)))
 
         # Request And Store Nickname
         client.send('NICK'.encode('ascii'))
