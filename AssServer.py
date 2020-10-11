@@ -9,14 +9,14 @@ port = 55555
 # Starting Server and listen for connections
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind((host, port))
-server.listen()
+server.listen(5)
 
 # Lists For Clients and Their Nicknames
 names = '' #
 connections = {} #dictionary wehre the key is the socket - value is [address, name, channel]
 channels = {"lobby" : []} #dictionary where key is the channel name - value is list of channels
 
-def listen():
+def listenForUser():
     '''
     This method listens for clients to connect and then awaits
     to reveiver either a control message or a normal message. 
@@ -43,7 +43,7 @@ def broadcast(message):
 
 
 def main():
-    pass
+    listenForUser()
 
 
 if __name__ == "__main__":

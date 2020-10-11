@@ -3,16 +3,13 @@ import threading
 import sys
 
 # Listening to Server and Sending Nickname
-def receive(client, nickname):
+def receive(client, clientName):
     while True:
         try:
             # Receive Message From Server
-            # If 'NICK' Send Nickname
-            message = client.recv(1024).decode('utf-8')
-            if message == 'NICK':
-                client.send(nickname.encode('utf-8'))
-            else:
-                print(message)
+            serverResponse = client.recv(2048)
+            client.send(clientName.encode('utf-8'))
+            print(serverResponse)
         except:
             # Close Connection When Error
             print("An error occured!")
@@ -21,22 +18,26 @@ def receive(client, nickname):
 
 
 # Sending Messages To Server
-def write(client, nickname):
+def write(client, clientName):
     while True:
-        message = '{}: {}'.format(nickname, input(''))
+        message = '{}: {}'.format(clientName, input(''))
         client.send(message.encode('utf-8'))
 
 
 def main():
+    #argv[0] - script name
+    clientName = sys.argv[1]
+    host = sys.argv[2]
+    port = int(sys.argv[3])
     # Connecting To Server
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client.connect((sys.argv[2], int(sys.argv[3])))
-
+    client.connect((host, port))
+    print ("\nConnected to server at \nHost: {} \nPort: {}\n".format(host, port))
     # Starting Threads For Listening And Writing
-    receive_thread = threading.Thread(target=receive(client, sys.argv[1]))
+    receive_thread = threading.Thread(target=receive(client, clientName))
     receive_thread.start()
 
-    write_thread = threading.Thread(target=write(client, sys.argv[1]))
+    write_thread = threading.Thread(target=write(client, clientName))
     write_thread.start()
 
 

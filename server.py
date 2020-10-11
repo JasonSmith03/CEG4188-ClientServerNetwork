@@ -4,64 +4,60 @@
 
 import socket
 import threading
+import sys
 
-# Connection Data
-host = '127.0.0.1'
-port = 55555
+PORT = 55555
+HOST = 'localhost'
+BUFF_SIZE = 2048
 
-# Starting Server
-server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server.bind((host, port))
-server.listen()
 
-# Lists For Clients and Their Nicknames
-clients = []
-nicknames = []
 
-# Sending Messages To All Connected Clients
-def broadcast(message):
-    for client in clients:
-        #print(client)
-        client.send(message)
-
-# Handling Messages From Clients
-def handle(client):
+def client_thread(connection):
+    '''
+    Receives client information such as name, IP, and port number.
+    Then sends a welcome message to the client to verify they are connected
+    '''
     while True:
-        try:
-            # Broadcasting Messages
-            message = client.recv(1024)
-            broadcast(message)
-        except:
-            # Removing And Closing Clients
-            index = clients.index(client)
-            clients.remove(client)
-            client.close()
-            nickname = nicknames[index]
-            broadcast('{} left!'.format(nickname).encode('ascii'))
-            nicknames.remove(nickname)
+        data = connection.recv(BUFF_SIZE)
+        if not data:
             break
+        print("new user: {}".format(data))
+        connection.send("Welcome {}".format(data))
+    connection.close()
 
-# Receiving / Listening Function
-def receive():
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#show the socket and the port bind
+try: 
+    s.bind((HOST, PORT)) 
+    print ("socket binded to port: {}".format(PORT))
+except socket.error as e:
+    print(e)
+s.listen(5) 
+print ("socket is listening\n")
+
+def listenForMessage():
+    '''
+    This method listens for clients to connect and then awaits
+    to reveiver either a control message or a normal message. 
+    This method should first check to see if there is a message
+    from a particular user, if message is blank then remove from channel.
+    '''
+    THREAD_COUNT = 0
+
     while True:
-        # Accept Connection
-        client, address = server.accept()
-        print("Connected with {}".format(str(address)))
-        print("Accepted client {}".format(str(client)))
-
-        # Request And Store Nickname
-        client.send('NICK'.encode('ascii'))
-        nickname = client.recv(1024).decode('ascii')
-        nicknames.append(nickname)
-        clients.append(client)
-
-        # Print And Broadcast Nickname
-        print("Nickname is {}".format(nickname))
-        broadcast("{} joined!".format(nickname).encode('ascii'))
-        client.send('Connected to server!'.encode('ascii'))
-
-        # Start Handling Thread For Client
-        thread = threading.Thread(target=handle, args=(client,))
+        client, address = s.accept()
+        thread = threading.Thread()
         thread.start()
+        THREAD_COUNT+=1
+        print ("Thread count: {}".format(THREAD_COUNT))
+        client_thread(client)
+        #thread = threading.Thread(target=write(client, clientName))
+        #thread.start()
 
-receive()
+def main():
+    listenForMessage()
+    s.close()
+
+
+if __name__ == "__main__":
+    main()
