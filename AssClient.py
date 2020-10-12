@@ -14,26 +14,25 @@ port = int(sys.argv[3])
 
 #Method to recieve messages
 def receive(client_socket):
-	counter = 0
-	while True:
-		
-		message = client_socket.recv(1024).decode()
-		print(message)
+    counter = 0
+    while True:
+        message = client_socket.recv(1024).decode()
+        print(message)
 
 #Method to send messages
 def write(client_socket, clientName):
-	while True:
-		message = raw_input(">")
-		message = ("[" + clientName + "]: " + message)
-		client_socket.send(message.encode())
+    while True:
+        message = raw_input(">")
+        message = ("[" + clientName + "]: " + message)
+        client_socket.send(message.encode())
 
 #Method to allow user to send an first message
 def initInteraction(client_socket):
-    message = client_socket.recv(BUFF_SIZE)
-    print message
+    #message = client_socket.recv(BUFF_SIZE)
+    #print message
     channel = raw_input(">")
     client_socket.send(channel)
-    select_channel = client_socket.recv(BUFF_SIZE)
+    #select_channel = client_socket.recv(BUFF_SIZE)
 
 def main():
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -44,7 +43,7 @@ def main():
     print(serverResponse) #welcome <user>
     
     initInteraction(client_socket)
-
+    print("initInteraction() completed")
     # Starting Threads For Listening And Writing
     receive_thread = threading.Thread(target=receive, args=(client_socket,))
     write_thread = threading.Thread(target=write, args=(client_socket, clientName))
