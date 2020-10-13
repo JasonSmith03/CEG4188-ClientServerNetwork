@@ -16,7 +16,7 @@ CONNECTIONLIST = {} #key = channel names, value = usernames
 
 def new_connection(clientHost):
     '''
-        Welcomes the client and asks to choose among a list of actions
+    Welcomes the client and asks to choose among a list of actions
     '''
     #receive username from client
     userName = clientHost.recv(BUFF_SIZE)
@@ -67,7 +67,7 @@ def new_connection(clientHost):
 
 def broadcast(channelName, message):
     '''
-        This message declares a new user in the chat to all existing users in that chat
+    This message declares a new user in the chat to all existing users in that chat
     '''
     #send message to each member in channel
     for key, value in CONNECTIONLIST.items():
@@ -78,9 +78,19 @@ def broadcast(channelName, message):
                 
 def start_conversation(clientHost):
     '''
-        This function handles message transaction between all users
+    This function handles message transaction between all users
     '''
-    pass
+    while True:
+        message = clientHost.recv(BUFF_SIZE)
+        for key, value in CONNECTIONLIST.items():
+            for user in value:
+                if(clientHost in user):
+                    channel = key
+                    break
+
+        broadcast(channel, message)
+
+
 
 
 def main():
@@ -99,11 +109,9 @@ def main():
         #thread.start()
         new_connection(clientHost)
 
-        #print to server the list of channels and all users in those channels
-        print(CONNECTIONLIST)
-
         # thread = threading.Thread(target=start_conversation, args=(clientHost))
         # thread.start()
+        start_conversation(clientHost)
         print("testing: end of thread")
         #thread.join()
 
