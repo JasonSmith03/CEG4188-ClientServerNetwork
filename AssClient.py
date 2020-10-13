@@ -6,17 +6,29 @@ import socket
 import threading
 import sys
 
+#Global variables
 BUFF_SIZE = 2048
 #argv[0] - script name
-clientName = sys.argv[1]
-host = sys.argv[2]
-port = int(sys.argv[3])
+USERNAME = sys.argv[1]
+HOST = sys.argv[2]
+PORT = int(sys.argv[3])
+CLIENTSOCKET = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+def firstAction():
+    #client selects action and tells server
+    action = raw_input(">")
+    CLIENTSOCKET.send(action)
+
+    #client receives confirmation from server
+    serverResponse = CLIENTSOCKET.recv(BUFF_SIZE)
+    print(serverResponse)
+    serverResponse = CLIENTSOCKET.recv(BUFF_SIZE)
+    print(serverResponse)
 
 #Method to recieve messages
 def receive(client_socket):
-    counter = 0
     while True:
-        message = client_socket.recv(1024).decode()
+        message = client_socket.recv(BUFF_SIZE)
         print(message)
 
 #Method to send messages
@@ -24,35 +36,24 @@ def write(client_socket, clientName):
     while True:
         message = raw_input(">")
         message = ("[" + clientName + "]: " + message)
-        client_socket.send(message.encode())
-
-#Method to allow user to send an first message
-def initInteraction(client_socket):
-    #message = client_socket.recv(BUFF_SIZE)
-    #print message
-    channel = raw_input(">")
-    client_socket.send(channel)
-    #select_channel = client_socket.recv(BUFF_SIZE)
+        client_socket.send(message)
 
 def main():
-    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect((host, port))
-    print ("\nConnected to server at \nHost: {} \nPort: {}\n".format(host, port))
-    client_socket.send(clientName)
-    serverResponse = client_socket.recv(BUFF_SIZE)
-    print(serverResponse) #welcome <user>
-    
-    initInteraction(client_socket)
-    print("initInteraction() completed")
+    #connect user to server and send username
+    CLIENTSOCKET.connect((HOST, PORT))
+    CLIENTSOCKET.send(USERNAME)
+
+    #Receive welcome statement from server
+    serverResponse = CLIENTSOCKET.recv(BUFF_SIZE)
+    print(serverResponse)
+
+    #User chooses first action
+    firstAction()
     # Starting Threads For Listening And Writing
-    receive_thread = threading.Thread(target=receive, args=(client_socket,))
-    write_thread = threading.Thread(target=write, args=(client_socket, clientName))
+    receive_thread = threading.Thread(target=receive, args=(CLIENTSOCKET,))
+    write_thread = threading.Thread(target=write, args=(CLIENTSOCKET, USERNAME))
     receive_thread.start()
     write_thread.start()
-
-
-    client_socket.close()
-
 
 if __name__ == "__main__":
     main()
